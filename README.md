@@ -1,3 +1,4 @@
+**Discussion Retrieval Augmented Generation (dRAG)** is a local, privacy-focused tool designed to help educators quickly and efficiently answer discussion questions using their course materials, such as syllabi and lecture notes. It leverages cutting-edge Retrieval-Augmented Generation (RAG) techniques to generate accurate and context-aware responses. By running entirely offline, dRAG ensures that sensitive student data stays under your control, making it a secure choice for academic environments.
 ## Environment Setup Instructions
 
 Follow these steps to set up your development environment:

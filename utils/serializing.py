@@ -38,15 +38,14 @@ def serialize_generated_answer(results):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(serialized_data, f, ensure_ascii=False, indent=2)
+    return file_path
 
 
-def read_serialized_generated_answer(file_name):
+def read_serialized_generated_answer(file_path):
     queries = []
     documents = []
-    answers = []
+    generated_answers = []
     staff_answers = []
-
-    file_path = os.path.join("documents/generation_output", file_name)
 
     with open(file_path, "r", encoding="utf-8") as f:
         serialized_data = json.load(f)
@@ -59,11 +58,11 @@ def read_serialized_generated_answer(file_name):
             ]
             documents.append(document)
 
-            answer = entry.get("data", "")
-            answers.append(answer)
+            generated_answer = entry.get("data", "")
+            generated_answers.append(generated_answer)
             staff_answer = entry.get("answer", "")
             staff_answers.append(staff_answer)
-    return queries, documents, answers, staff_answers
+    return queries, documents, generated_answers, staff_answers
 
 
 def serialize_evaluation_results(evaluation_results):

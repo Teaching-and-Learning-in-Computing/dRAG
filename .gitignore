@@ -1,20 +1,11 @@
 # Compiled source #
 *.pyc
 
-# Model files and ChromaDB data #
-*.gguf
-*.bin
-*.sqlite3
-
+# Virtualenv #
+*.venv
 
 # Supported ingest files #
 *.pdf
-*.txt
-*.docx
-*.doc
 
 # Serialized data #
 *.json
-
-# Api keys #
-*.deepeval

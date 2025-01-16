@@ -1,0 +1,37 @@
+[project]
+name = "dRAG"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "accelerate>=1.2.1",
+    "haystack-ai>=2.9.0",
+    "mermaid-py>=0.7.0",
+    "ollama-haystack>=2.1.2",
+    "pdfminer-six>=20240706",
+    "sentence-transformers>=3.3.1",
+    "sentencepiece>=0.2.0",
+    "torch>=2.5.1",
+    "transformers>=4.48.0",
+]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cu121", marker = "platform_system != 'Darwin'"},
+  { index = "pytorch-cpu", marker = "platform_system == 'Darwin'" },
+]
+torchvision = [
+  { index = "pytorch-cu121", marker = "platform_system != 'Darwin'"},
+  { index = "pytorch-cpu", marker = "platform_system == 'Darwin'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

@@ -21,13 +21,8 @@ def run_evaluation_pipeline(file_path):
     )
 
     all_results = []
-    counter = 0
 
     for query, document, answer in zip(queries, documents, answers):
-        print("Query for counter {}: {}".format(counter, query))
-        print("Answer for counter {}: {}".format(counter, answer))
-        if counter > 3:
-            break
         try:
             result = evaluator.run(
                 questions=[query], contexts=[document], predicted_answers=[answer]
@@ -36,6 +31,5 @@ def run_evaluation_pipeline(file_path):
         except ValueError as e:
             print(f"Skipping due to error: {e}")
             continue
-        counter += 1
 
     serialize_evaluation_results(all_results)

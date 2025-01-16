@@ -32,7 +32,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/your-repo/dRAG
+git clone https://github.com/Teaching-and-Learning-in-Computing/dRAG
 cd dRAG
 ```
 

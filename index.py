@@ -7,14 +7,31 @@ from haystack_integrations.components.embedders.ollama import OllamaDocumentEmbe
 
 
 def run_index_pipeline():
+    """
+    Executes the index pipeline to preprocess, embed, and store PDF documents in an in-memory document store.
+
+    The pipeline components include:
+        - PDFMinerToDocument: Converts PDF files into text-based documents.
+        - DocumentCleaner: Cleans and preprocesses document text.
+        - DocumentSplitter: Splits large documents into smaller chunks.
+        - OllamaDocumentEmbedder: Embeds the document chunks using a specified model.
+        - DocumentWriter: Stores the processed and embedded documents.
+
+    Returns:
+        InMemoryDocumentStore: A document store containing the processed and embedded documents.
+    """
     document_store = InMemoryDocumentStore()
     index_pipeline = Pipeline()
     index_pipeline.add_component("pdf_converter", PDFMinerToDocument())
     index_pipeline.add_component("document_cleaner", DocumentCleaner())
-    index_pipeline.add_component("document_splitter", DocumentSplitter())
+    index_pipeline.add_component(
+        "document_splitter", DocumentSplitter()
+    )  # currently splitting with default values
     index_pipeline.add_component(
         "document_embedder",
-        OllamaDocumentEmbedder(model="snowflake-arctic-embed2"),
+        OllamaDocumentEmbedder(
+            model="snowflake-arctic-embed2"
+        ),  # same model as TextEmbedder in generate
     )
     index_pipeline.add_component("document_writer", DocumentWriter(document_store))
 

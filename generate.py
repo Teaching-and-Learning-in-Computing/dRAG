@@ -18,6 +18,26 @@ device = ComponentDevice.resolve_device()
 
 
 def run_generate_pipeline(document_store):
+    """
+    Executes the generate pipeline to process queries and generate answers
+      based on the provided document store and input json file.
+
+    The pipeline components include:
+        - OllamaTextEmbedder: Generates embeddings for the input query.
+        - InMemoryEmbeddingRetriever: Retrieves documents based on the query embeddings.
+        - InMemoryBM25Retriever: Retrieves documents using BM25 for term-based ranking.
+        - DocumentJoiner: Combines documents from multiple retrievers.
+        - TransformersSimilarityRanker: Ranks documents based on semantic similarity.
+        - ChatPromptBuilder: Builds a chat prompt using the query and ranked documents.
+        - OllamaChatGenerator: Generates responses using a specified LLM model.
+        - AnswerBuilder: Compiles the generated answer along with supporting documents.
+
+    Args:
+        document_store (DocumentStore): An instance of a Haystack document store containing indexed documents.
+
+    Returns:
+        str: A JSON-serialized string containing the ground truth answers and generated answers for each query.
+    """
     system_message = ChatMessage.from_system(system_prompt)
     user_message = ChatMessage.from_user("Query: {{query}}\n\n Answer: ")
     chat_template = [system_message, user_message]
@@ -26,7 +46,10 @@ def run_generate_pipeline(document_store):
     generate.add_component(
         "text_embedder",
         OllamaTextEmbedder(
-            model="snowflake-arctic-embed2", generation_kwargs={"num_ctx: 8192"}
+            model="snowflake-arctic-embed2",  # we can probably go smaller
+            generation_kwargs={
+                "num_ctx": 8192
+            },  # Ollama has a bug where if no ctx is specified, it sets it to a small default
         ),
     )
     generate.add_component(
@@ -35,7 +58,12 @@ def run_generate_pipeline(document_store):
     generate.add_component("bm25_retriever", InMemoryBM25Retriever(document_store))
     generate.add_component("document_joiner", DocumentJoiner())
     generate.add_component(
-        "ranker", TransformersSimilarityRanker(model="BAAI/bge-reranker-v2-m3", device=device, top_k=3)
+        "ranker",
+        TransformersSimilarityRanker(
+            model="BAAI/bge-reranker-v2-m3",  # switching this to OllamaRanker (or whatever it will be called) would be better
+            device=device,
+            top_k=3,  # we can make this larger if we believe the LLM can handle it
+        ),
     )
     generate.add_component(
         "prompt_builder",
@@ -43,7 +71,13 @@ def run_generate_pipeline(document_store):
             template=chat_template, required_variables=["query", "documents"]
         ),
     )
-    generate.add_component("llm", OllamaChatGenerator(model="qwen2.5:latest", generation_kwargs={"seed": 42}))
+    generate.add_component(
+        "llm",
+        OllamaChatGenerator(
+            model="qwen2.5:latest",  # biggest variable here, we should try different models
+            generation_kwargs={"seed": 42},
+        ),
+    )
     generate.add_component("answer_builder", AnswerBuilder())
 
     generate.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
@@ -60,8 +94,8 @@ def run_generate_pipeline(document_store):
     prompts = read_input_json("documents/input/input.json")
     results = []
     for prompt_dict in prompts:
-        query = prompt_dict["question"]
-        answer = prompt_dict["answer"]
+        query = prompt_dict.get("question", "")
+        answer = prompt_dict.get("answer", "")
         result = generate.run(
             {
                 "text_embedder": {"text": query},

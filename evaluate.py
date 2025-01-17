@@ -8,15 +8,15 @@ from utils.serializing import (
 
 
 def run_evaluation_pipeline(file_path):
-    queries, documents, answers, _ = read_serialized_generated_answer(
-        file_path
-    )
+    queries, documents, answers, _ = read_serialized_generated_answer(file_path)
 
     evaluator = FaithfulnessEvaluator(
         api_key=Secret.from_token("test-api-key"),
         api_params={
             "api_base_url": "http://localhost:11434/v1",
             "model": "qwen2.5:latest",
+            # same as the generate model, but we can use
+            #  something different that is better at evaluation?
         },
     )
 
